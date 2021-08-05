@@ -1,0 +1,15 @@
+input {
+  background-color: white;
+  border: 1px solid grey;
+  border-radius: 4px;
+  width: 400px;
+  height: 20px;
+  font-size: 24px;
+  font-family: "Times New Roman", Times, serif;
+  text-align: center;
+  margin: 2px;
+}
+
+input:focus {
+  background-color: lightyellow;
+}

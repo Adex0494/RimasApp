@@ -1,23 +1,19 @@
-import logo from './logo.svg';
-import './App.css';
+import WordBox from "./Components/WordBox";
+import RhymingWords from "./Components/RhymingWords";
 
 function App() {
+  const DUMMY_WORDS = [
+    "zorra",
+    "porra",
+    "corra",
+    "chorra",
+    "borra",
+    "lorra",
+    "ñorra",
+  ];
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <WordBox></WordBox>;<RhymingWords wordList={DUMMY_WORDS}></RhymingWords>
     </div>
   );
 }
