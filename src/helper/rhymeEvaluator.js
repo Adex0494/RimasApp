@@ -85,39 +85,71 @@ const separateBySyllable = (word) => {
   let syllables = [];
   let nextSyllable = "";
   let syllableCount = 0;
-  const wordArray = Array.from(word);
-  wordArray.forEach((letter, i) => {
-    const currentSyllableCount = syllableCount;
+  //const wordArray = Array.from(word);
+  for (let i = 0; i < word.length; i++) {
+    let currentSyllableCount = syllableCount;
     let letterInSyllableCount = 0;
-    while (currentSyllableCount === syllableCount) {
-      if (letterInSyllableCount === 0) {
-        if (wordArray.length > i + 2) {
-          const letterPair = `${wordArray[i]}${wordArray[i + 1]}`;
-          switch (determineLetterPairType(letterPair)) {
-            case "consonant":
-              if (letterInSyllableCount === 0) {
-                nextSyllable = nextSyllable.concat(letter);
-                //if(wordArray.length>i+1)
-                nextSyllable = nextSyllable.concat(wordArray[i + 1]);
-                if (wordArray.length > i + 2) {
+
+    if (letterInSyllableCount === 0) {
+      if (word.length >= i + 2) {
+        const letterPair = `${word[i]}${word[i + 1]}`;
+        let letterPairType = determineLetterPairType(letterPair);
+        if (
+          letterPairType === "consonant-vowel" ||
+          letterPairType === "diptongo" ||
+          letterPairType === "double-consonant"
+        ) {
+          nextSyllable = letterPair;
+          i++;
+
+          if (word.length >= i + 2) {
+            if (
+              determineLetterPairType(`${letterPair[1]}${word[i + 2]}`) ===
+              "diptongo"
+            ) {
+              nextSyllable = nextSyllable + word[i + 2];
+              i++;
+            }
+          }
+
+          if (i === word.length - 1) {
+            if (
+              determineLetterPairType(`${word[i - 1]}${word[i]}`) === "hiato"
+            ) {
+              syllables.push(nextSyllable);
+              syllables.push(word[i]);
+              return syllables;
+            }
+            syllables.push(`${nextSyllable}${word[i]}`);
+            return syllables;
+          }
+
+          i++;
+          if (word.length >= i + 2) {
+            const letterPair = `${word[i]}${word[i + 1]}`;
+            let letterPairType = determineLetterPairType(letterPair);
+            //letterPairType==='consonant-vowel' || undividedConsonantPairs.includes(letterPair)
+            if (letterPairType === "double-consonant") {
+              if (word.length >= i + 3) {
+                if (vowels.includes(word[i + 2])) {
+                  nextSyllable = nextSyllable + letterPair[0];
+                  syllables.push(nextSyllable);
+                }
+                if (consonants.includes(word[i + 2])) {
+                  nextSyllable = nextSyllable + letterPair;
+                  syllables.push(nextSyllable);
+                  i++;
                 }
               }
-              break;
-            case "closed vowel":
-              break;
-            case "open vowel":
-              break;
-            case "stressed vowel":
-              break;
-
-            default:
-              break;
+            }
           }
         }
       }
     }
-  });
-  syllables.push(nextSyllable);
+
+    // syllableCount++;
+  }
+  //syllables.push(nextSyllable);
   return syllables;
 };
 
@@ -129,5 +161,7 @@ const separateBySyllable = (word) => {
 // let arr = ["la", "al", "ll", "aé", "éa", "íu", "úi", "ps"];
 
 // arr.forEach((pair) => console.log(pair + " - ", determineLetterPairType(pair)));
+
+separateBySyllable("palomo");
 
 const doWordsRhyme = (word1, word2) => {};
