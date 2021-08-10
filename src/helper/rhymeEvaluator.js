@@ -84,70 +84,124 @@ const separateByLetter = (word) => {
 const separateBySyllable = (word) => {
   let syllables = [];
   let nextSyllable = "";
-  let syllableCount = 0;
   //const wordArray = Array.from(word);
   for (let i = 0; i < word.length; i++) {
-    let currentSyllableCount = syllableCount;
-    let letterInSyllableCount = 0;
+    if (word.length === i + 1) {
+      syllables.push(nextSyllable + word[i]);
+    }
 
-    if (letterInSyllableCount === 0) {
-      if (word.length >= i + 2) {
-        const letterPair = `${word[i]}${word[i + 1]}`;
-        let letterPairType = determineLetterPairType(letterPair);
-        if (
-          letterPairType === "consonant-vowel" ||
-          letterPairType === "diptongo" ||
-          letterPairType === "double-consonant"
-        ) {
-          nextSyllable = letterPair;
+    if (word.length >= i + 2) {
+      const letterPair = `${word[i]}${word[i + 1]}`;
+      let letterPairType = determineLetterPairType(letterPair);
+      let hasPushed = false;
+
+      if (letterPairType === "hiato") {
+        syllables.push(letterPair[0]);
+        continue;
+      }
+
+      if (letterPairType === "double-consonant") {
+        nextSyllable = letterPair;
+        i++;
+        continue;
+      }
+
+      if (letterPairType === "vowel-consonant") {
+        nextSyllable = nextSyllable + letterPair[0];
+      }
+
+      if (
+        letterPairType === "consonant-vowel" ||
+        letterPairType === "diptongo" ||
+        letterPairType === "vowel-consonant"
+      ) {
+        if (letterPairType !== "vowel-consonant") {
+          nextSyllable = nextSyllable + letterPair;
           i++;
 
           if (word.length >= i + 2) {
             if (
-              determineLetterPairType(`${letterPair[1]}${word[i + 2]}`) ===
+              determineLetterPairType(`${letterPair[1]}${word[i + 1]}`) ===
               "diptongo"
             ) {
-              nextSyllable = nextSyllable + word[i + 2];
+              nextSyllable = nextSyllable + word[i + 1];
               i++;
             }
-          }
-
-          if (i === word.length - 1) {
             if (
-              determineLetterPairType(`${word[i - 1]}${word[i]}`) === "hiato"
+              determineLetterPairType(`${letterPair[1]}${word[i + 1]}`) ===
+              "hiato"
             ) {
               syllables.push(nextSyllable);
-              syllables.push(word[i]);
-              return syllables;
-            }
-            syllables.push(`${nextSyllable}${word[i]}`);
-            return syllables;
-          }
-
-          i++;
-          if (word.length >= i + 2) {
-            const letterPair = `${word[i]}${word[i + 1]}`;
-            let letterPairType = determineLetterPairType(letterPair);
-            //letterPairType==='consonant-vowel' || undividedConsonantPairs.includes(letterPair)
-            if (letterPairType === "double-consonant") {
-              if (word.length >= i + 3) {
-                if (vowels.includes(word[i + 2])) {
-                  nextSyllable = nextSyllable + letterPair[0];
-                  syllables.push(nextSyllable);
-                }
-                if (consonants.includes(word[i + 2])) {
-                  nextSyllable = nextSyllable + letterPair;
-                  syllables.push(nextSyllable);
-                  i++;
-                }
-              }
+              //hasPushed = true;
+              nextSyllable = "";
+              continue;
             }
           }
         }
+
+        if (i + 1 === word.length - 1) {
+          if (determineLetterPairType(`${word[i]}${word[i + 1]}`) === "hiato") {
+            syllables.push(nextSyllable);
+            syllables.push(word[i + 1]);
+            return syllables;
+          }
+          syllables.push(`${nextSyllable}${word[i + 1]}`);
+          return syllables;
+        }
+
+        i++;
+        //if (!hasPushed)
+        if (word.length >= i + 2) {
+          const letterPair = `${word[i]}${word[i + 1]}`;
+          let letterPairType = determineLetterPairType(letterPair);
+          //letterPairType==='consonant-vowel' || undividedConsonantPairs.includes(letterPair)
+          if (letterPairType === "double-consonant") {
+            //i++;
+            if (word.length >= i + 3) {
+              if (
+                vowels.includes(word[i + 2]) &&
+                !undividedConsonantPairs.includes(letterPair)
+              ) {
+                nextSyllable = nextSyllable + letterPair[0];
+                syllables.push(nextSyllable);
+                hasPushed = true;
+              }
+              if (
+                consonants.includes(word[i + 2]) &&
+                !undividedConsonantPairs.includes(
+                  `${letterPair[1]}${word[i + 2]}`
+                )
+              ) {
+                nextSyllable = nextSyllable + letterPair;
+                syllables.push(nextSyllable);
+                hasPushed = true;
+                i++;
+              }
+              if (
+                consonants.includes(word[i + 2]) &&
+                undividedConsonantPairs.includes(
+                  `${letterPair[1]}${word[i + 2]}`
+                )
+              ) {
+                nextSyllable = nextSyllable + letterPair[0];
+                syllables.push(nextSyllable);
+                hasPushed = true;
+              }
+            } else {
+              //There is no word in spanish that ends with 2 consonants
+              console.log("incorrect word");
+              return [];
+            }
+          }
+        }
+
+        if (!hasPushed) {
+          syllables.push(nextSyllable);
+          i--;
+        }
       }
     }
-
-    // syllableCount++;
+    nextSyllable = "";
   }
   //syllables.push(nextSyllable);
   return syllables;
@@ -162,6 +216,8 @@ const separateBySyllable = (word) => {
 
 // arr.forEach((pair) => console.log(pair + " - ", determineLetterPairType(pair)));
 
-separateBySyllable("palomo");
+let syllables = separateBySyllable("blabstraccion");
+
+console.log(syllables);
 
 const doWordsRhyme = (word1, word2) => {};
