@@ -42,6 +42,8 @@ const undividedConsonantPairs = [
   "gr",
   "ll",
   "rr",
+  "pr",
+  "pl",
   "tl",
   "tr",
   "kl",
@@ -126,6 +128,14 @@ const separateBySyllable = (word) => {
             ) {
               nextSyllable = nextSyllable + word[i + 1];
               i++;
+              if (
+                word.length >= i + 2 &&
+                determineLetterPairType(`${word[i]}${word[i + 1]}`) ===
+                  "diptongo"
+              ) {
+                nextSyllable = nextSyllable + word[i + 1];
+                i++;
+              }
             }
             if (
               determineLetterPairType(`${letterPair[1]}${word[i + 1]}`) ===
@@ -188,7 +198,7 @@ const separateBySyllable = (word) => {
                 hasPushed = true;
               }
             } else {
-              //There is no word in spanish that ends with 2 consonants
+              //There is no word in spanish that ends with 2 consonants. Check for more exceptions...
               console.log("incorrect word");
               return [];
             }
@@ -207,6 +217,11 @@ const separateBySyllable = (word) => {
   return syllables;
 };
 
+export const getSyllablesSeparated = (word) => {
+  const wordArr = separateBySyllable(word);
+  return wordArr.join("-");
+};
+
 // const word = "aábcdeéfghiíjklmnñoópqrstuúúvwxyz@AÁ";
 
 // let arr = Array.from(word);
@@ -216,7 +231,7 @@ const separateBySyllable = (word) => {
 
 // arr.forEach((pair) => console.log(pair + " - ", determineLetterPairType(pair)));
 
-let syllables = separateBySyllable("blabstraccion");
+let syllables = separateBySyllable("quiero");
 
 console.log(syllables);
 

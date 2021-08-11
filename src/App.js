@@ -1,7 +1,11 @@
 import WordBox from "./Components/WordBox";
 import RhymingWords from "./Components/RhymingWords";
+import WordLabel from "./Components/WordLabel";
+import classes from "./App.module.css";
+import { useState } from "react";
 
 function App() {
+  const [wordInSyllables, setWordInSyllables] = useState("");
   const DUMMY_WORDS = [
     "zorra",
     "porra",
@@ -11,9 +15,18 @@ function App() {
     "lorra",
     "ñorra",
   ];
+
+  const showWordInSyllable = (word) => {
+    setWordInSyllables(word);
+  };
   return (
-    <div>
-      <WordBox></WordBox>;<RhymingWords wordList={DUMMY_WORDS}></RhymingWords>
+    <div className={classes}>
+      <div>
+        <WordBox submitHandler={showWordInSyllable}></WordBox>
+      </div>
+      <div>
+        <WordLabel word={wordInSyllables}></WordLabel>
+      </div>
     </div>
   );
 }
