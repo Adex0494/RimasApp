@@ -6,6 +6,7 @@ import { useState } from "react";
 
 function App() {
   const [wordInSyllables, setWordInSyllables] = useState("");
+  const [wordType, setWordType] = useState("");
   const DUMMY_WORDS = [
     "zorra",
     "porra",
@@ -16,16 +17,19 @@ function App() {
     "ñorra",
   ];
 
-  const showWordInSyllable = (word) => {
+  const showWordInSyllableAndType = (word, theWordType) => {
     setWordInSyllables(word);
+    setWordType(theWordType);
   };
+
   return (
     <div className={classes}>
       <div>
-        <WordBox submitHandler={showWordInSyllable}></WordBox>
+        <WordBox submitHandler={showWordInSyllableAndType}></WordBox>
       </div>
       <div>
         <WordLabel word={wordInSyllables}></WordLabel>
+        <WordLabel word={wordType}></WordLabel>
       </div>
     </div>
   );

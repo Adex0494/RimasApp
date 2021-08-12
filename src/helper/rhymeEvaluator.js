@@ -79,13 +79,10 @@ const determineLetterPairType = (letterPair) => {
   return "undefined";
 };
 
-const separateByLetter = (word) => {
-  return Array.from(word);
-};
-
 const separateBySyllable = (word) => {
+  word = word.toLowerCase();
   let syllables = [];
-  let nextSyllable = "";
+  let nextSyllable = ""; //Has the next syllable that is being buildt
   //const wordArray = Array.from(word);
   for (let i = 0; i < word.length; i++) {
     if (word.length === i + 1) {
@@ -98,17 +95,20 @@ const separateBySyllable = (word) => {
       let hasPushed = false;
 
       if (letterPairType === "hiato") {
+        //hiato must be separated
         syllables.push(letterPair[0]);
         continue;
       }
 
       if (letterPairType === "double-consonant") {
+        //a syllable starting with double consonants
         nextSyllable = letterPair;
         i++;
         continue;
       }
 
       if (letterPairType === "vowel-consonant") {
+        //vowel-consonant can be the start of a syllable or not
         nextSyllable = nextSyllable + letterPair[0];
       }
 
@@ -124,14 +124,14 @@ const separateBySyllable = (word) => {
           if (word.length >= i + 2) {
             if (
               determineLetterPairType(`${letterPair[1]}${word[i + 1]}`) ===
-              "diptongo"
+              "diptongo" //a diptongo is always in the same syllable
             ) {
               nextSyllable = nextSyllable + word[i + 1];
               i++;
               if (
                 word.length >= i + 2 &&
                 determineLetterPairType(`${word[i]}${word[i + 1]}`) ===
-                  "diptongo"
+                  "diptongo" //a diptongo can be followed by another diptongo, forming a triptongo
               ) {
                 nextSyllable = nextSyllable + word[i + 1];
                 i++;
@@ -139,7 +139,7 @@ const separateBySyllable = (word) => {
             }
             if (
               determineLetterPairType(`${letterPair[1]}${word[i + 1]}`) ===
-              "hiato"
+              "hiato" //hiato is separated
             ) {
               syllables.push(nextSyllable);
               //hasPushed = true;
@@ -150,13 +150,17 @@ const separateBySyllable = (word) => {
         }
 
         if (i + 1 === word.length - 1) {
+          //what to do if next letter is the last
           if (determineLetterPairType(`${word[i]}${word[i + 1]}`) === "hiato") {
+            //separate hiato
             syllables.push(nextSyllable);
             syllables.push(word[i + 1]);
-            return syllables;
+            //return syllables;
+            break;
           }
           syllables.push(`${nextSyllable}${word[i + 1]}`);
-          return syllables;
+          //return syllables;
+          break;
         }
 
         i++;
@@ -166,8 +170,10 @@ const separateBySyllable = (word) => {
           let letterPairType = determineLetterPairType(letterPair);
           //letterPairType==='consonant-vowel' || undividedConsonantPairs.includes(letterPair)
           if (letterPairType === "double-consonant") {
+            //Decision to make if next pair of letters is doble-consonant
             //i++;
             if (word.length >= i + 3) {
+              //it depends on the letter that is right after and wether the double-consonant is undivided or not
               if (
                 vowels.includes(word[i + 2]) &&
                 !undividedConsonantPairs.includes(letterPair)
@@ -213,26 +219,55 @@ const separateBySyllable = (word) => {
     }
     nextSyllable = "";
   }
-  //syllables.push(nextSyllable);
+
+  //Change first character to upper case
+  syllables[0] = syllables[0].replace(
+    syllables[0][0],
+    syllables[0][0].toUpperCase()
+  );
+
   return syllables;
+};
+
+export const determineAccent = (word) => {
+  let wordType;
+  const wordSyllables = separateBySyllable(word);
+
+  if (wordSyllables.length === 1) {
+    wordType = "aguda";
+  } else {
+    let accentPosition;
+    const hasAccentMark = wordSyllables.some((syllable, i) => {
+      const foundAccent = Array.from(syllable).some((letter) => {
+        if (stressedVowels.includes(letter)) {
+          accentPosition = i;
+          return true;
+        } else return false;
+      });
+      if (foundAccent) return true;
+      else return false;
+    });
+
+    if (hasAccentMark) {
+      if (accentPosition === wordSyllables.length - 1) wordType = "aguda";
+      if (accentPosition === wordSyllables.length - 2) wordType = "grave";
+      if (accentPosition === wordSyllables.length - 3) wordType = "esdrújula";
+      if (accentPosition < wordSyllables.length - 3) wordType = "sobresdrújula";
+    } else {
+      if (
+        word[word.length - 1] === "n" ||
+        word[word.length - 1] === "s" ||
+        vowels.includes(word[word.length - 1])
+      )
+        wordType = "grave";
+      else wordType = "aguda";
+    }
+  }
+
+  return wordType;
 };
 
 export const getSyllablesSeparated = (word) => {
   const wordArr = separateBySyllable(word);
   return wordArr.join("-");
 };
-
-// const word = "aábcdeéfghiíjklmnñoópqrstuúúvwxyz@AÁ";
-
-// let arr = Array.from(word);
-// arr.forEach((letter) => console.log(letter, getLetterType(letter)));
-
-// let arr = ["la", "al", "ll", "aé", "éa", "íu", "úi", "ps"];
-
-// arr.forEach((pair) => console.log(pair + " - ", determineLetterPairType(pair)));
-
-let syllables = separateBySyllable("quiero");
-
-console.log(syllables);
-
-const doWordsRhyme = (word1, word2) => {};

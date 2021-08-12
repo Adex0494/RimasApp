@@ -1,6 +1,9 @@
 import classes from "./WordBox.module.css";
 import { useRef, useState } from "react";
-import { getSyllablesSeparated } from "../helper/rhymeEvaluator";
+import {
+  getSyllablesSeparated,
+  determineAccent,
+} from "../helper/rhymeEvaluator";
 
 function WordBox(props) {
   const [inputValue, setInputValue] = useState("");
@@ -8,12 +11,15 @@ function WordBox(props) {
 
   const submitHandler = (e) => {
     e.preventDefault();
-    props.submitHandler(getSyllablesSeparated(inputValue));
+    props.submitHandler(
+      getSyllablesSeparated(inputValue),
+      determineAccent(inputValue)
+    );
     setInputValue("");
   };
 
   const changeInputValue = (e) => {
-    setInputValue(e.target.value);
+    setInputValue(e.target.value.trim());
   };
 
   return (
