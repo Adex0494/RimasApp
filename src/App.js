@@ -2,11 +2,15 @@ import WordBox from "./Components/WordBox";
 import RhymingWords from "./Components/RhymingWords";
 import WordLabel from "./Components/WordLabel";
 import classes from "./App.module.css";
-import { useState } from "react";
+import React, { useState } from "react";
+import { determineLyricism } from "../src/helper/rhymeEvaluator";
 
 function App() {
   const [wordInSyllables, setWordInSyllables] = useState("");
   const [wordType, setWordType] = useState("");
+  const [lyricism, setLyricism] = useState("");
+  const [word1, setWord1] = useState("");
+  const [word2, setWord2] = useState("");
   const DUMMY_WORDS = [
     "zorra",
     "porra",
@@ -22,16 +26,48 @@ function App() {
     setWordType(theWordType);
   };
 
+  const showLyricismOfWords = () => {
+    setLyricism(determineLyricism(word1, word2));
+  };
+
   return (
-    <div className={classes}>
-      <div>
-        <WordBox submitHandler={showWordInSyllableAndType}></WordBox>
+    <React.Fragment>
+      <div className={classes}>
+        <div>
+          <WordBox
+            submitHandler={showWordInSyllableAndType}
+            clearWord={true}
+          ></WordBox>
+        </div>
+        <div>
+          <WordLabel word={wordInSyllables}></WordLabel>
+          <WordLabel word={wordType}></WordLabel>
+        </div>
       </div>
-      <div>
-        <WordLabel word={wordInSyllables}></WordLabel>
-        <WordLabel word={wordType}></WordLabel>
+
+      <div className={classes}>
+        <div>
+          <WordBox
+            submitHandler={showLyricismOfWords}
+            onChangeInput={(value) => {
+              setWord1(value);
+            }}
+          ></WordBox>
+        </div>
+        <div>
+          <WordBox
+            submitHandler={showLyricismOfWords}
+            onChangeInput={(value) => {
+              setWord2(value);
+            }}
+          ></WordBox>
+        </div>
+
+        <div>
+          <WordLabel word={lyricism}></WordLabel>
+        </div>
       </div>
-    </div>
+    </React.Fragment>
   );
 }
 

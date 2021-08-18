@@ -13,13 +13,14 @@ function WordBox(props) {
     e.preventDefault();
     props.submitHandler(
       getSyllablesSeparated(inputValue),
-      determineAccent(inputValue)
+      determineAccent(inputValue)[0]
     );
-    setInputValue("");
+    if (props.clearWord) setInputValue("");
   };
 
   const changeInputValue = (e) => {
     setInputValue(e.target.value.trim());
+    props.onChangeInput?.(e.target.value.trim());
   };
 
   return (

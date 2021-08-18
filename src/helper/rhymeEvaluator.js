@@ -27,8 +27,6 @@ const openVowels = ["a", "e", "o", "á", "é", "í", "ó", "ú"];
 const closedVowels = ["i", "u", "ü"];
 const stressedVowels = ["á", "é", "í", "ó", "ú"];
 const specialCombo = ["gu", "gü", "qu"];
-const hybridConsonantPair = ["ps", "sc"];
-const companyingConsonants = ["l", "r"];
 const undividedConsonantPairs = [
   "bl",
   "br",
@@ -232,11 +230,12 @@ const separateBySyllable = (word) => {
 export const determineAccent = (word) => {
   let wordType;
   const wordSyllables = separateBySyllable(word);
+  let accentPosition;
 
   if (wordSyllables.length === 1) {
+    accentPosition = 0;
     wordType = "aguda";
   } else {
-    let accentPosition;
     const hasAccentMark = wordSyllables.some((syllable, i) => {
       const foundAccent = Array.from(syllable).some((letter) => {
         if (stressedVowels.includes(letter)) {
@@ -258,16 +257,97 @@ export const determineAccent = (word) => {
         word[word.length - 1] === "n" ||
         word[word.length - 1] === "s" ||
         vowels.includes(word[word.length - 1])
-      )
+      ) {
         wordType = "grave";
-      else wordType = "aguda";
+        accentPosition = wordSyllables.length - 2;
+      } else {
+        wordType = "aguda";
+        accentPosition = wordSyllables.length - 1;
+      }
     }
   }
 
-  return wordType;
+  return [wordType, accentPosition];
+};
+
+const determineSyllableNature = (syllable) => {
+  syllable = syllable.toLowerCase();
+  for (let i = 0; i < syllable.length; i++) {
+    if (vowels.includes(syllable[i])) {
+      if (i === syllable.length - 1 || consonants.includes(syllable[i + 1]))
+        return "cima-simple";
+      if (
+        i + 2 < syllable.length &&
+        vowels.includes(syllable[i + 1]) &&
+        vowels.includes(syllable[i + 2])
+      )
+        return "triptongo";
+      if (openVowels.includes(syllable[i])) return "diptongo-decreciente";
+      return "diptongo-creciente";
+    }
+  }
+  return "undefined";
+};
+
+const getSyllableFromStrongVowel = (syllable) => {
+  syllable = syllable.toLowerCase();
+  const syllableNature = determineSyllableNature(syllable);
+  for (let i = 0; i < syllable.length; i++) {
+    if (vowels.includes(syllable[i])) {
+      //console.log(syllable.slice(i), syllableNature);
+      if (
+        syllableNature === "cima-simple" ||
+        syllableNature === "diptongo-decreciente"
+      )
+        return syllable.slice(i);
+      if (syllableNature === "diptongo-creciente") return syllable.slice(i + 1);
+      if (syllableNature === "triptongo") {
+        for (let j = i; j < 3; j++) {
+          if (openVowels.includes(syllable[j])) return syllable.slice(j);
+        }
+      }
+    }
+  }
+  return "";
 };
 
 export const getSyllablesSeparated = (word) => {
   const wordArr = separateBySyllable(word);
   return wordArr.join("-");
+};
+
+export const determineLyricism = (word1, word2) => {
+  if (determineAccent(word1)[0] === determineAccent(word2)[0]) {
+    const word1LyricalSyllables = separateBySyllable(word1).slice(
+      determineAccent(word1)[1]
+    );
+    const word2LyricalSyllables = separateBySyllable(word2).slice(
+      determineAccent(word2)[1]
+    );
+    if (
+      //Determine if there is a perfect rhyme
+      word1LyricalSyllables.join("").toLowerCase() ===
+      word2LyricalSyllables.join("").toLowerCase()
+    )
+      return "Rima perfecta";
+    else {
+      // if there is no perfect rhyme
+      //console.log(word1LyricalSyllables);
+      word1LyricalSyllables[0] = getSyllableFromStrongVowel(
+        word1LyricalSyllables[0]
+      );
+      word2LyricalSyllables[0] = getSyllableFromStrongVowel(
+        word2LyricalSyllables[0]
+      );
+      //console.log(word1LyricalSyllables, word2LyricalSyllables);
+      if (
+        word1LyricalSyllables.join("").toLowerCase() ===
+        word2LyricalSyllables.join("").toLowerCase()
+      )
+        return "Rima regular";
+      else if (1) {
+      }
+    }
+  }
+  return "No rima";
 };
