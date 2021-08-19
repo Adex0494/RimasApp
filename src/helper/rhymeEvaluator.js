@@ -26,6 +26,13 @@ const vowels = ["a", "á", "e", "é", "i", "í", "o", "ó", "u", "ú", "ü"];
 const openVowels = ["a", "e", "o", "á", "é", "í", "ó", "ú"];
 const closedVowels = ["i", "u", "ü"];
 const stressedVowels = ["á", "é", "í", "ó", "ú"];
+const relaxedStressedVowelPairs = [
+  ["a", "á"],
+  ["e", "é"],
+  ["i", "í"],
+  ["o", "ó"],
+  ["u", "ú"],
+];
 const specialCombo = ["gu", "gü", "qu"];
 const undividedConsonantPairs = [
   "bl",
@@ -79,6 +86,9 @@ const determineLetterPairType = (letterPair) => {
 
 const separateBySyllable = (word) => {
   word = word.toLowerCase();
+
+  //word = transformWordToPhonetism(word);
+
   let syllables = [];
   let nextSyllable = ""; //Has the next syllable that is being buildt
   //const wordArray = Array.from(word);
@@ -94,7 +104,9 @@ const separateBySyllable = (word) => {
 
       if (letterPairType === "hiato") {
         //hiato must be separated
-        syllables.push(letterPair[0]);
+        nextSyllable += letterPair[0];
+        syllables.push(nextSyllable);
+        nextSyllable = "";
         continue;
       }
 
@@ -203,8 +215,13 @@ const separateBySyllable = (word) => {
               }
             } else {
               //There is no word in spanish that ends with 2 consonants. Check for more exceptions...
-              console.log("incorrect word");
-              return [];
+              //console.log("incorrect word");
+              //return [];
+              console.log(letterPair);
+              nextSyllable = nextSyllable + letterPair;
+              syllables.push(nextSyllable);
+              hasPushed = true;
+              i++;
             }
           }
         }
@@ -311,9 +328,62 @@ const getSyllableFromStrongVowel = (syllable) => {
   return "";
 };
 
+const getVowelsFromSyllable = (syllable) => {
+  syllable = syllable.toLowerCase();
+  let syllableVowels = "";
+  for (let i = 0; i < syllable.length; i++) {
+    if (vowels.includes(syllable[i])) syllableVowels += syllable[i];
+  }
+  return syllableVowels;
+};
+
 export const getSyllablesSeparated = (word) => {
   const wordArr = separateBySyllable(word);
   return wordArr.join("-");
+};
+
+//alteration of orthography for easier comparisson of lyricism
+const transformWordToPhonetism = (word) => {
+  word = word.toLowerCase();
+  word = word
+    .replaceAll("z", "s")
+    .replaceAll("x", "ks")
+    .replaceAll("ce", "se")
+    .replaceAll("ci", "si")
+    .replaceAll("cé", "sé")
+    .replaceAll("cí", "sí")
+    .replaceAll("ss", "s")
+    .replaceAll("ch", "x") //auxiliar substitution
+    .replaceAll("h", "") //this is done to eliminate muted 'h'
+    .replaceAll("c", "k")
+    .replaceAll("x", "ch") //restore 'ch'
+    .replaceAll("que", "ke")
+    .replaceAll("qué", "ké")
+    .replaceAll("qui", "ki")
+    .replaceAll("quí", "kí")
+    .replaceAll("q", "k")
+    .replaceAll("v", "b")
+    .replaceAll("nb", "mb")
+    .replaceAll("ge", "je")
+    .replaceAll("gi", "ji")
+    .replaceAll("gé", "jé")
+    .replaceAll("gí", "jí")
+    .replaceAll("gue", "ge")
+    .replaceAll("gui", "gi")
+    .replaceAll("gué", "gé")
+    .replaceAll("guí", "gí")
+    .replaceAll("ü", "u")
+    .replaceAll("ll", "y")
+    .replaceAll("w", "u");
+
+  return word;
+};
+
+const replaceStressedVowel = (word) => {
+  for (let i = 0; i < word.length; i++) {
+    if (stressedVowels.includes(word[i])) {
+    }
+  }
 };
 
 export const determineLyricism = (word1, word2) => {
@@ -344,8 +414,23 @@ export const determineLyricism = (word1, word2) => {
         word1LyricalSyllables.join("").toLowerCase() ===
         word2LyricalSyllables.join("").toLowerCase()
       )
+        // if words are the same except the consonants before vowels of the first syllables, from the lyrical syllables
         return "Rima regular";
-      else if (1) {
+      else {
+        // Rima vaga if only the vowels of the lyrical syllables are the same, without taking into account the consonants of the first syllables nor wether they are stressed or not
+        const word1LyricalVowels = word1LyricalSyllables.map((syllable) =>
+          getVowelsFromSyllable(syllable)
+        );
+        const word2LyricalVowels = word2LyricalSyllables.map((syllable) =>
+          getVowelsFromSyllable(syllable)
+        );
+        if (
+          word1LyricalVowels.every(
+            (vowelsFromSyllable, i) =>
+              vowelsFromSyllable === word2LyricalVowels[i]
+          )
+        )
+          return "Rima vaga";
       }
     }
   }
