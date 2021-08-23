@@ -26,13 +26,6 @@ const vowels = ["a", "á", "e", "é", "i", "í", "o", "ó", "u", "ú", "ü"];
 const openVowels = ["a", "e", "o", "á", "é", "í", "ó", "ú"];
 const closedVowels = ["i", "u", "ü"];
 const stressedVowels = ["á", "é", "í", "ó", "ú"];
-const relaxedStressedVowelPairs = [
-  ["a", "á"],
-  ["e", "é"],
-  ["i", "í"],
-  ["o", "ó"],
-  ["u", "ú"],
-];
 const specialCombo = ["gu", "gü", "qu"];
 const undividedConsonantPairs = [
   "bl",
@@ -217,7 +210,7 @@ const separateBySyllable = (word) => {
               //There is no word in spanish that ends with 2 consonants. Check for more exceptions...
               //console.log("incorrect word");
               //return [];
-              console.log(letterPair);
+              //console.log(letterPair);
               nextSyllable = nextSyllable + letterPair;
               syllables.push(nextSyllable);
               hasPushed = true;
@@ -332,7 +325,13 @@ const getVowelsFromSyllable = (syllable) => {
   syllable = syllable.toLowerCase();
   let syllableVowels = "";
   for (let i = 0; i < syllable.length; i++) {
-    if (vowels.includes(syllable[i])) syllableVowels += syllable[i];
+    if (vowels.includes(syllable[i])) {
+      if (stressedVowels.includes(syllable[i])) {
+        syllableVowels += replaceStressedVowel(syllable[i]); //replace stressed vowel with the non stressed vowel
+      } else {
+        syllableVowels += syllable[i];
+      }
+    }
   }
   return syllableVowels;
 };
@@ -379,15 +378,20 @@ const transformWordToPhonetism = (word) => {
   return word;
 };
 
-const replaceStressedVowel = (word) => {
-  for (let i = 0; i < word.length; i++) {
-    if (stressedVowels.includes(word[i])) {
-    }
-  }
+const replaceStressedVowel = (vowel) => {
+  if (vowel === "á") return "a";
+  if (vowel === "é") return "e";
+  if (vowel === "í") return "i";
+  if (vowel === "ó") return "o";
+  if (vowel === "ú") return "u";
 };
 
 export const determineLyricism = (word1, word2) => {
   if (determineAccent(word1)[0] === determineAccent(word2)[0]) {
+    //
+    word1 = transformWordToPhonetism(word1);
+    word2 = transformWordToPhonetism(word2);
+
     const word1LyricalSyllables = separateBySyllable(word1).slice(
       determineAccent(word1)[1]
     );
