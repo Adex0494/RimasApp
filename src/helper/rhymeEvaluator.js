@@ -399,7 +399,7 @@ export const determineLyricism = (word1, word2) => {
       determineAccent(word2)[1]
     );
     if (
-      //Determine if there is a perfect rhyme
+      //Determine if there is a perfect rhyme. NOTE: some words are not identical but sound exactly the same. Example: cómo and como. This has to be taken into considaration
       word1LyricalSyllables.join("").toLowerCase() ===
       word2LyricalSyllables.join("").toLowerCase()
     )

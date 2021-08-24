@@ -1,0 +1,26 @@
+textarea {
+  background-color: white;
+  border: 1px solid grey;
+  border-radius: 4px;
+  resize: none;
+  font-size: 24px;
+  font-family: "Times New Roman", Times, serif;
+  text-align: left;
+  margin: 2px;
+}
+
+textarea:focus {
+  background-color: lightyellow;
+}
+
+textarea::-webkit-scrollbar {
+  width: 13px;
+}
+
+textarea::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 10px #97acb1;
+}
+
+textarea::-webkit-scrollbar-thumb {
+  background-color: grey;
+}
