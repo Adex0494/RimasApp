@@ -229,10 +229,10 @@ const separateBySyllable = (word) => {
   }
 
   //Change first character to upper case
-  syllables[0] = syllables[0].replace(
-    syllables[0][0],
-    syllables[0][0].toUpperCase()
-  );
+  // syllables[0] = syllables[0].replace(
+  //   syllables[0][0],
+  //   syllables[0][0].toUpperCase()
+  // );
 
   return syllables;
 };
@@ -344,6 +344,19 @@ export const getSyllablesSeparated = (word) => {
 //alteration of orthography for easier comparisson of lyricism
 const transformWordToPhonetism = (word) => {
   word = word.toLowerCase();
+
+  let yIndex = 0;
+  while (yIndex > -1) {
+    yIndex = word.indexOf("y", yIndex);
+    if (
+      yIndex === word.length - 1 ||
+      (yIndex < word.length - 1 && !vowels.includes(word[yIndex + 1]))
+    ) {
+      word = word.replace("y", "i"); //Substitute every 'y' that sounds like 'i' for i
+    }
+    if (yIndex !== -1) yIndex++;
+  }
+
   word = word
     .replaceAll("z", "s")
     .replaceAll("x", "ks")
@@ -356,6 +369,7 @@ const transformWordToPhonetism = (word) => {
     .replaceAll("h", "") //this is done to eliminate muted 'h'
     .replaceAll("c", "k")
     .replaceAll("x", "ch") //restore 'ch'
+    .replaceAll("sh", "ch") //currently, there is no oficial word in spanish with 'sh', but just in case...
     .replaceAll("que", "ke")
     .replaceAll("qué", "ké")
     .replaceAll("qui", "ki")
@@ -386,38 +400,54 @@ const replaceStressedVowel = (vowel) => {
   if (vowel === "ú") return "u";
 };
 
+const replaceStressedVowelOfWord = (word) => {
+  for (let i = 0; i < word.length; i++) {
+    if (stressedVowels.includes(word[i])) {
+      word = word.replace(word[i], replaceStressedVowel(word[i]));
+      break;
+    }
+  }
+  return word;
+};
+
 export const determineLyricism = (word1, word2) => {
-  if (determineAccent(word1)[0] === determineAccent(word2)[0]) {
-    //
+  const word1Accent = determineAccent(word1);
+  const word2Accent = determineAccent(word2);
+  if (word1Accent[0] === word2Accent[0]) {
     word1 = transformWordToPhonetism(word1);
     word2 = transformWordToPhonetism(word2);
 
     const word1LyricalSyllables = separateBySyllable(word1).slice(
-      determineAccent(word1)[1]
+      word1Accent[1]
     );
     const word2LyricalSyllables = separateBySyllable(word2).slice(
-      determineAccent(word2)[1]
+      word2Accent[1]
     );
+
+    //NOTE: some words are not identical but sound exactly the same. Example: cómo and como. This has to be taken into considaration. This is why stressed vowels are replaced
+    word1LyricalSyllables[0] = replaceStressedVowelOfWord(
+      word1LyricalSyllables[0]
+    );
+    word2LyricalSyllables[0] = replaceStressedVowelOfWord(
+      word2LyricalSyllables[0]
+    );
+
     if (
-      //Determine if there is a perfect rhyme. NOTE: some words are not identical but sound exactly the same. Example: cómo and como. This has to be taken into considaration
-      word1LyricalSyllables.join("").toLowerCase() ===
-      word2LyricalSyllables.join("").toLowerCase()
+      //Determine if there is a perfect rhyme.
+      word1LyricalSyllables.join("") === word2LyricalSyllables.join("")
     )
       return "Rima perfecta";
     else {
       // if there is no perfect rhyme
-      //console.log(word1LyricalSyllables);
+
       word1LyricalSyllables[0] = getSyllableFromStrongVowel(
         word1LyricalSyllables[0]
       );
       word2LyricalSyllables[0] = getSyllableFromStrongVowel(
         word2LyricalSyllables[0]
       );
-      //console.log(word1LyricalSyllables, word2LyricalSyllables);
-      if (
-        word1LyricalSyllables.join("").toLowerCase() ===
-        word2LyricalSyllables.join("").toLowerCase()
-      )
+
+      if (word1LyricalSyllables.join("") === word2LyricalSyllables.join(""))
         // if words are the same except the consonants before vowels of the first syllables, from the lyrical syllables
         return "Rima regular";
       else {

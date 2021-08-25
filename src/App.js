@@ -54,14 +54,14 @@ function App() {
 
   return (
     <React.Fragment>
-      {/* <div className={classes}>
+      <div className={classes}>
         <div>
           <WordBox
             submitHandler={showWordInSyllableAndType}
             clearWord={true}
           ></WordBox>
         </div>
-        <div> 
+        <div>
           <WordLabel word={wordInSyllables}></WordLabel>
           <WordLabel word={wordType}></WordLabel>
         </div>
@@ -88,7 +88,7 @@ function App() {
         <div>
           <WordLabel word={lyricism}></WordLabel>
         </div>
-      </div> */}
+      </div>
       <TextBox
         onChange={(value) => {
           setTextAreaValue(value);
