@@ -6,6 +6,9 @@ import classes from "./App.module.css";
 import Button from "./Components/Button";
 import React, { useState } from "react";
 import { determineLyricism } from "../src/helper/rhymeEvaluator";
+import ColorWord from "./Components/ColoredWord";
+import ColoredWordsContainer from "./Components/ColoredWordsContainer";
+import ColoredWord from "./Components/ColoredWord";
 
 function App() {
   const [wordInSyllables, setWordInSyllables] = useState("");
@@ -15,6 +18,8 @@ function App() {
   const [word2, setWord2] = useState("");
   const [rhymes, setRhymes] = useState([]);
   const [textAreaValue, setTextAreaValue] = useState("");
+  const [colorWords, setColorWords] = useState(false);
+  const [containerChildren, setContainerChildren] = useState();
 
   const showWordInSyllableAndType = (word, theWordType) => {
     setWordInSyllables(word);
@@ -26,6 +31,19 @@ function App() {
   };
 
   const getListOfRhymes = (text) => {
+    const stylesArr = [
+      {
+        backgroundColor: "white",
+        color: "red",
+        fontSize: "24px",
+      },
+      {
+        backgroundColor: "white",
+        color: "blue",
+        fontSize: "24px",
+      },
+    ];
+    const wordStyleArr = [];
     const words = text
       .replace(/[.,/#¡!$%^&*;:{}=\-—_`~()""''¿?«»‘’“”\[\]'\\' ]/g, " ")
       .split(" ")
@@ -35,6 +53,12 @@ function App() {
     words.forEach((word) => {
       if (listOfRhymes.length === 0) {
         listOfRhymes.push([word]);
+        // stylesArr.push({
+        //   backgroundColor: "white",
+        //   color: "red",
+        //   fontSize: "24px",
+        // });
+        wordStyleArr.push([word, 0]);
       } else {
         let hasARhyme = false;
         for (let i = 0; i < listOfRhymes.length; i++) {
@@ -42,12 +66,31 @@ function App() {
           if (lyricism !== "No rima") {
             hasARhyme = true;
             listOfRhymes[i].push(word);
+            wordStyleArr.push([word, i]);
             break;
           }
         }
-        if (!hasARhyme) listOfRhymes.push([word]);
+        if (!hasARhyme) {
+          listOfRhymes.push([word]);
+          // stylesArr.push({
+          //   backgroundColor: "white",
+          //   color: "red",
+          //   fontSize: "24px",
+          // });
+          wordStyleArr.push([word, listOfRhymes.length - 1]);
+        }
       }
     });
+
+    setContainerChildren(
+      wordStyleArr.map((wordStyle, i) => (
+        <ColoredWord key={i} style={stylesArr[wordStyle[1]]}>
+          {`${wordStyle[0]} `}
+        </ColoredWord>
+      ))
+    );
+
+    setColorWords(true);
     console.log(listOfRhymes);
     return listOfRhymes;
   };
@@ -89,13 +132,17 @@ function App() {
           <WordLabel word={lyricism}></WordLabel>
         </div>
       </div>
-      <TextBox
-        onChange={(value) => {
-          setTextAreaValue(value);
-        }}
-        rows={30}
-        cols={50}
-      ></TextBox>
+      {colorWords ? (
+        <ColoredWordsContainer>{containerChildren}</ColoredWordsContainer>
+      ) : (
+        <TextBox
+          onChange={(value) => {
+            setTextAreaValue(value);
+          }}
+          rows={30}
+          cols={50}
+        ></TextBox>
+      )}
       <Button
         onClick={() => {
           getListOfRhymes(textAreaValue);
