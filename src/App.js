@@ -30,18 +30,43 @@ function App() {
     setLyricism(determineLyricism(word1, word2));
   };
 
+  const generateHexRandomColor = () => {
+    const rgbColor = [0, 0, 0];
+    let sum = 0;
+    rgbColor.forEach((color, i) => {
+      if (i === 2) {
+        let randomNumber;
+        if (sum < 70) {
+          randomNumber = 70 - sum + Math.round(255 * Math.random());
+        }
+        if (sum > 445) {
+          randomNumber = Math.round((700 - sum) * Math.random());
+        }
+        if (sum >= 70 && sum <= 445) {
+          randomNumber = Math.round(255 * Math.random());
+        }
+        rgbColor[2] = randomNumber.toString(16);
+      }
+      let numb = Math.round(255 * Math.random());
+      sum += numb;
+      rgbColor[i] = numb.toString(16);
+    });
+
+    return "#" + rgbColor[0] + rgbColor[1] + rgbColor[2];
+  };
+
   const getListOfRhymes = (text) => {
     const stylesArr = [
-      {
-        backgroundColor: "white",
-        color: "red",
-        fontSize: "24px",
-      },
-      {
-        backgroundColor: "white",
-        color: "blue",
-        fontSize: "24px",
-      },
+      // {
+      //   backgroundColor: "white",
+      //   color: "red",
+      //   fontSize: "24px",
+      // },
+      // {
+      //   backgroundColor: "white",
+      //   color: "blue",
+      //   fontSize: "24px",
+      // },
     ];
     const wordStyleArr = [];
     const words = text
@@ -50,34 +75,48 @@ function App() {
       .filter((word) => word !== "");
     //console.log(words);
     const listOfRhymes = [];
-    words.forEach((word) => {
+    words.forEach((word, wordIndex) => {
       if (listOfRhymes.length === 0) {
-        listOfRhymes.push([word]);
+        //First word?
+        listOfRhymes.push([[word, wordIndex]]); //Put word as the first element of a list of words that rhyme. This element is an array with the word and the its index
         // stylesArr.push({
         //   backgroundColor: "white",
-        //   color: "red",
+        //   color: generateHexRandomColor,
         //   fontSize: "24px",
         // });
-        wordStyleArr.push([word, 0]);
+
+        //wordStyleArr.push([word, -1]);//
+        words[wordIndex] = [word, -1];
       } else {
         let hasARhyme = false;
         for (let i = 0; i < listOfRhymes.length; i++) {
-          const lyricism = determineLyricism(word, listOfRhymes[i][0]);
+          const lyricism = determineLyricism(word, listOfRhymes[i][0][0]);
           if (lyricism !== "No rima") {
+            if (listOfRhymes[i].length === 1) {
+              stylesArr.push({
+                backgroundColor: "white",
+                color: generateHexRandomColor,
+                fontSize: "24px",
+              });
+              words[listOfRhymes[i][0][1]][1] = stylesArr.length - 1;
+            }
+
+            if (listOfRhymes[i].length > 1) {
+              words[wordIndex] = [word, listOfRhymes[i][0][1]]; //incorrect Modify algorithm
+            }
+
             hasARhyme = true;
-            listOfRhymes[i].push(word);
-            wordStyleArr.push([word, i]);
+            listOfRhymes[i].push([word, wordIndex]);
+            //wordStyleArr.push([word, i]);
+            words[wordIndex] = [word, stylesArr.length - 1];
             break;
           }
         }
         if (!hasARhyme) {
-          listOfRhymes.push([word]);
-          // stylesArr.push({
-          //   backgroundColor: "white",
-          //   color: "red",
-          //   fontSize: "24px",
-          // });
-          wordStyleArr.push([word, listOfRhymes.length - 1]);
+          listOfRhymes.push([[word, wordIndex]]);
+
+          //wordStyleArr.push([word, listOfRhymes.length - 1]);
+          words[wordIndex] = [word, -1];
         }
       }
     });
