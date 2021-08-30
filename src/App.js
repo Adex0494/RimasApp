@@ -51,22 +51,17 @@ function App() {
       sum += numb;
       rgbColor[i] = numb.toString(16);
     });
-
+    //console.log("#" + rgbColor[0] + rgbColor[1] + rgbColor[2]);
     return "#" + rgbColor[0] + rgbColor[1] + rgbColor[2];
   };
 
   const getListOfRhymes = (text) => {
     const stylesArr = [
-      // {
-      //   backgroundColor: "white",
-      //   color: "red",
-      //   fontSize: "24px",
-      // },
-      // {
-      //   backgroundColor: "white",
-      //   color: "blue",
-      //   fontSize: "24px",
-      // },
+      {
+        backgroundColor: "white",
+        color: "black",
+        fontSize: "24px",
+      },
     ];
     const wordStyleArr = [];
     const words = text
@@ -81,12 +76,12 @@ function App() {
         listOfRhymes.push([[word, wordIndex]]); //Put word as the first element of a list of words that rhyme. This element is an array with the word and the its index
         // stylesArr.push({
         //   backgroundColor: "white",
-        //   color: generateHexRandomColor,
+        //   color: generateHexRandomColor(),
         //   fontSize: "24px",
         // });
 
         //wordStyleArr.push([word, -1]);//
-        words[wordIndex] = [word, -1];
+        words[wordIndex] = [word, 0]; //0 means the word does not have a rhyme, yet. Hence, it has the default style (0)
       } else {
         let hasARhyme = false;
         for (let i = 0; i < listOfRhymes.length; i++) {
@@ -95,20 +90,20 @@ function App() {
             if (listOfRhymes[i].length === 1) {
               stylesArr.push({
                 backgroundColor: "white",
-                color: generateHexRandomColor,
+                color: generateHexRandomColor(),
                 fontSize: "24px",
               });
-              words[listOfRhymes[i][0][1]][1] = stylesArr.length - 1;
-            }
-
-            if (listOfRhymes[i].length > 1) {
-              words[wordIndex] = [word, listOfRhymes[i][0][1]]; //incorrect Modify algorithm
+              const styleIndex = stylesArr.length - 1;
+              listOfRhymes[i][0].push(styleIndex); //The first element of the corresponding array in the list of rhymes now is pushed the style index as reference for next words that rhyme. Only the first element has this extra data
+              words[listOfRhymes[i][0][1]][1] = styleIndex; //Now the [word,-1] in the wordIndex stored in the first element mentioned above becomes [word,styleIndex]
+              words[wordIndex] = [word, styleIndex];
+            } else {
+              words[wordIndex] = [word, listOfRhymes[i][0][2]]; //This word now has the style index of the first element of the corresponding  array in the list of rhymes (the same element mentioned above).
             }
 
             hasARhyme = true;
             listOfRhymes[i].push([word, wordIndex]);
             //wordStyleArr.push([word, i]);
-            words[wordIndex] = [word, stylesArr.length - 1];
             break;
           }
         }
@@ -116,13 +111,13 @@ function App() {
           listOfRhymes.push([[word, wordIndex]]);
 
           //wordStyleArr.push([word, listOfRhymes.length - 1]);
-          words[wordIndex] = [word, -1];
+          words[wordIndex] = [word, 0];
         }
       }
     });
 
     setContainerChildren(
-      wordStyleArr.map((wordStyle, i) => (
+      words.map((wordStyle, i) => (
         <ColoredWord key={i} style={stylesArr[wordStyle[1]]}>
           {`${wordStyle[0]} `}
         </ColoredWord>
@@ -130,6 +125,7 @@ function App() {
     );
 
     setColorWords(true);
+    console.log(words);
     console.log(listOfRhymes);
     return listOfRhymes;
   };
