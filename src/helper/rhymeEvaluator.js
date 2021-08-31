@@ -350,7 +350,9 @@ const transformWordToPhonetism = (word) => {
     yIndex = word.indexOf("y", yIndex);
     if (
       yIndex === word.length - 1 ||
-      (yIndex < word.length - 1 && !vowels.includes(word[yIndex + 1]))
+      (yIndex !== -1 &&
+        yIndex < word.length - 1 &&
+        !vowels.includes(word[yIndex + 1]))
     ) {
       word = word.replace("y", "i"); //Substitute every 'y' that sounds like 'i' for i
     }
@@ -401,6 +403,8 @@ const replaceStressedVowel = (vowel) => {
 };
 
 const replaceStressedVowelOfWord = (word) => {
+  if (!word) return "";
+  //console.log(word);
   for (let i = 0; i < word.length; i++) {
     if (stressedVowels.includes(word[i])) {
       word = word.replace(word[i], replaceStressedVowel(word[i]));
@@ -411,6 +415,9 @@ const replaceStressedVowelOfWord = (word) => {
 };
 
 export const determineLyricism = (word1, word2) => {
+  word1 = word1.replace(/[.,/#¡!$%^&*;:{}=\-—_`~()""''¿?«»‘’“”[\]'\\' ]/g, ""); //Cleaning the word
+  word2 = word2.replace(/[.,/#¡!$%^&*;:{}=\-—_`~()""''¿?«»‘’“”[\]'\\' ]/g, "");
+  //console.log(word1, word2);
   const word1Accent = determineAccent(word1);
   const word2Accent = determineAccent(word2);
   if (word1Accent[0] === word2Accent[0]) {

@@ -1,5 +1,5 @@
 function ColoredWord(props) {
-  return <label style={props.style}>{props.children}</label>;
+  return <span style={props.style}>{props.children}</span>;
 }
 
 export default ColoredWord;

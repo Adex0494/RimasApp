@@ -58,14 +58,15 @@ function App() {
   const getListOfRhymes = (text) => {
     const stylesArr = [
       {
+        whiteSpace: "pre-wrap",
         backgroundColor: "white",
         color: "black",
         fontSize: "24px",
       },
     ];
-    const wordStyleArr = [];
+
     const words = text
-      .replace(/[.,/#¡!$%^&*;:{}=\-—_`~()""''¿?«»‘’“”\[\]'\\' ]/g, " ")
+      //.replace(/[.,/#¡!$%^&*;:{}=\-—_`~()""''¿?«»‘’“”\[\]'\\' ]/g, " ")
       .split(" ")
       .filter((word) => word !== "");
     //console.log(words);
@@ -74,21 +75,17 @@ function App() {
       if (listOfRhymes.length === 0) {
         //First word?
         listOfRhymes.push([[word, wordIndex]]); //Put word as the first element of a list of words that rhyme. This element is an array with the word and the its index
-        // stylesArr.push({
-        //   backgroundColor: "white",
-        //   color: generateHexRandomColor(),
-        //   fontSize: "24px",
-        // });
-
-        //wordStyleArr.push([word, -1]);//
         words[wordIndex] = [word, 0]; //0 means the word does not have a rhyme, yet. Hence, it has the default style (0)
       } else {
         let hasARhyme = false;
         for (let i = 0; i < listOfRhymes.length; i++) {
           const lyricism = determineLyricism(word, listOfRhymes[i][0][0]);
-          if (lyricism !== "No rima") {
+          if (lyricism === "Rima perfecta" || lyricism === "Rima regular") {
             if (listOfRhymes[i].length === 1) {
               stylesArr.push({
+                whiteSpace: "pre-wrap",
+                fontWeight: "bold",
+                fontStyle: "italic",
                 backgroundColor: "white",
                 color: generateHexRandomColor(),
                 fontSize: "24px",
@@ -103,30 +100,30 @@ function App() {
 
             hasARhyme = true;
             listOfRhymes[i].push([word, wordIndex]);
-            //wordStyleArr.push([word, i]);
             break;
           }
         }
         if (!hasARhyme) {
           listOfRhymes.push([[word, wordIndex]]);
 
-          //wordStyleArr.push([word, listOfRhymes.length - 1]);
           words[wordIndex] = [word, 0];
         }
       }
     });
 
     setContainerChildren(
-      words.map((wordStyle, i) => (
-        <ColoredWord key={i} style={stylesArr[wordStyle[1]]}>
-          {`${wordStyle[0]} `}
-        </ColoredWord>
-      ))
+      <p>
+        {words.map((wordStyle, i) => (
+          <ColoredWord key={i} style={stylesArr[wordStyle[1]]}>
+            {`${wordStyle[0]} `}
+          </ColoredWord>
+        ))}
+      </p>
     );
 
     setColorWords(true);
     console.log(words);
-    console.log(listOfRhymes);
+    //console.log(listOfRhymes);
     return listOfRhymes;
   };
 
