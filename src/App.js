@@ -16,7 +16,6 @@ function App() {
   const [lyricism, setLyricism] = useState("");
   const [word1, setWord1] = useState("");
   const [word2, setWord2] = useState("");
-  const [rhymes, setRhymes] = useState([]);
   const [textAreaValue, setTextAreaValue] = useState("");
   const [colorWords, setColorWords] = useState(false);
   const [containerChildren, setContainerChildren] = useState();
@@ -57,6 +56,7 @@ function App() {
 
   const getListOfRhymes = (text) => {
     const stylesArr = [
+      //default style for words that do not have a rhyming partner
       {
         whiteSpace: "pre-wrap",
         backgroundColor: "white",
@@ -67,11 +67,16 @@ function App() {
 
     const words = text
       //.replace(/[.,/#¡!$%^&*;:{}=\-—_`~()""''¿?«»‘’“”\[\]'\\' ]/g, " ")
+      .replaceAll("\n", " \n ")
       .split(" ")
       .filter((word) => word !== "");
     //console.log(words);
     const listOfRhymes = [];
     words.forEach((word, wordIndex) => {
+      if (word === "\n") {
+        //words[wordIndex] = [word, 0];
+        return;
+      }
       if (listOfRhymes.length === 0) {
         //First word?
         listOfRhymes.push([[word, wordIndex]]); //Put word as the first element of a list of words that rhyme. This element is an array with the word and the its index
@@ -113,16 +118,22 @@ function App() {
 
     setContainerChildren(
       <p>
-        {words.map((wordStyle, i) => (
-          <ColoredWord key={i} style={stylesArr[wordStyle[1]]}>
-            {`${wordStyle[0]} `}
-          </ColoredWord>
-        ))}
+        {words.map((wordStyle, i) =>
+          wordStyle !== "\n" ? (
+            <ColoredWord key={i} style={stylesArr[wordStyle[1]]}>
+              {`${wordStyle[0]} `}
+            </ColoredWord>
+          ) : (
+            <span key={i} style={{ whiteSpace: "pre-wrap" }}>
+              {"\n"}
+            </span> //next line
+          )
+        )}
       </p>
     );
 
     setColorWords(true);
-    console.log(words);
+    //console.log(words);
     //console.log(listOfRhymes);
     return listOfRhymes;
   };
@@ -173,6 +184,7 @@ function App() {
           }}
           rows={30}
           cols={50}
+          value={textAreaValue}
         ></TextBox>
       )}
       <Button
@@ -181,6 +193,14 @@ function App() {
         }}
         text="Determinar rimas"
       ></Button>
+      {colorWords && (
+        <Button
+          onClick={() => {
+            setColorWords(false);
+          }}
+          text="Editar"
+        ></Button>
+      )}
     </React.Fragment>
   );
 }

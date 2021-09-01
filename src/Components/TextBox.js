@@ -15,6 +15,7 @@ function TextBox(props) {
       rows={props.rows}
       cols={props.cols}
       className={classes}
+      value={props.value}
       required
     ></textarea>
   );
