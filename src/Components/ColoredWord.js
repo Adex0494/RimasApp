@@ -1,5 +1,14 @@
 function ColoredWord(props) {
-  return <span style={props.style}>{props.children}</span>;
+  return (
+    <span
+      onMouseOver={() => {
+        console.log(props.children);
+      }}
+      style={props.style}
+    >
+      {props.children}
+    </span>
+  );
 }
 
 export default ColoredWord;

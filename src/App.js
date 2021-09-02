@@ -20,6 +20,32 @@ function App() {
   const [colorWords, setColorWords] = useState(false);
   const [containerChildren, setContainerChildren] = useState();
 
+  const basicColors = [
+    "#FF0000", //red
+    "#00FF00", //Lime
+    "#0000FF", //Blue
+    //"#ADFF2F", //	green yellow
+    "#00FFFF", //Cyan/Aqua
+    "#FF00FF", //Magenta/Fuchsia
+    "#808080", //Grey
+    "#800000", //Maroon
+    "#808000", //Olve
+    "#008000", //Green
+    "#800080", //Purple
+    "#008080", //Teal
+    "#000080", //Navy
+    "#FF4500", //Orange Red
+    "#FFA500", //Orange
+    "#FFD700", //gold
+    "#B8860B", //dark golden rod
+    "#4682B4", //steel blue
+    "#191970", //midnight blue
+    "#7B68EE", //	medium slate blue
+    "#FF69B4", //hot pink
+    "#8B4513", //saddle brown
+    "#7FFFD4", //aqua marine
+  ];
+
   const showWordInSyllableAndType = (word, theWordType) => {
     setWordInSyllables(word);
     setWordType(theWordType);
@@ -36,19 +62,20 @@ function App() {
       if (i === 2) {
         let randomNumber;
         if (sum < 70) {
-          randomNumber = 70 - sum + Math.round(255 * Math.random());
+          randomNumber = 70 - sum + Math.round(255 * Math.random()); //Avoid colors close to black.
         }
-        if (sum > 445) {
-          randomNumber = Math.round((700 - sum) * Math.random());
+        if (sum > 345) {
+          randomNumber = Math.round((600 - sum) * Math.random()); //Avoid colors close to white.
         }
-        if (sum >= 70 && sum <= 445) {
+        if (sum >= 70 && sum <= 345) {
           randomNumber = Math.round(255 * Math.random());
         }
         rgbColor[2] = randomNumber.toString(16);
+      } else {
+        let numb = Math.round(255 * Math.random());
+        sum += numb;
+        rgbColor[i] = numb.toString(16);
       }
-      let numb = Math.round(255 * Math.random());
-      sum += numb;
-      rgbColor[i] = numb.toString(16);
     });
     //console.log("#" + rgbColor[0] + rgbColor[1] + rgbColor[2]);
     return "#" + rgbColor[0] + rgbColor[1] + rgbColor[2];
@@ -85,14 +112,21 @@ function App() {
         let hasARhyme = false;
         for (let i = 0; i < listOfRhymes.length; i++) {
           const lyricism = determineLyricism(word, listOfRhymes[i][0][0]);
-          if (lyricism === "Rima perfecta" || lyricism === "Rima regular") {
+          if (
+            lyricism === "Rima perfecta" ||
+            lyricism === "Rima regular" ||
+            lyricism === "Rima vaga"
+          ) {
             if (listOfRhymes[i].length === 1) {
               stylesArr.push({
                 whiteSpace: "pre-wrap",
                 fontWeight: "bold",
                 fontStyle: "italic",
                 backgroundColor: "white",
-                color: generateHexRandomColor(),
+                color:
+                  stylesArr.length <= basicColors.length
+                    ? basicColors[stylesArr.length - 1]
+                    : generateHexRandomColor(), //Select color from default colors or generate random one.
                 fontSize: "24px",
               });
               const styleIndex = stylesArr.length - 1;
