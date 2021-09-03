@@ -114,8 +114,8 @@ function App() {
           const lyricism = determineLyricism(word, listOfRhymes[i][0][0]);
           if (
             lyricism === "Rima perfecta" ||
-            lyricism === "Rima regular" ||
-            lyricism === "Rima vaga"
+            lyricism === "Rima regular" 
+            //lyricism === "Rima vaga"
           ) {
             if (listOfRhymes[i].length === 1) {
               stylesArr.push({
@@ -154,7 +154,7 @@ function App() {
       <p>
         {words.map((wordStyle, i) =>
           wordStyle !== "\n" ? (
-            <ColoredWord key={i} style={stylesArr[wordStyle[1]]}>
+            <ColoredWord key={i} style={stylesArr[wordStyle[1]]} styleIndex={[wordStyle[1]]}>
               {`${wordStyle[0]} `}
             </ColoredWord>
           ) : (
@@ -210,7 +210,7 @@ function App() {
         </div>
       </div>
       {colorWords ? (
-        <ColoredWordsContainer>{containerChildren}</ColoredWordsContainer>
+        <ColoredWordsContainer id='Words-Container'>{containerChildren}</ColoredWordsContainer>
       ) : (
         <TextBox
           onChange={(value) => {
