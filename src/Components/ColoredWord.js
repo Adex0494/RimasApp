@@ -1,12 +1,14 @@
 function ColoredWord(props) {
   return (
     <span
-      data-styleIndex = {props.styleIndex}
+      data-styleindex = {props.styleIndex}
       onMouseOver={() => {
-        document.querySelectorAll(`[data-styleIndex='${props.styleIndex}']`).forEach(el=> el.style.border="3px solid black")
+        if(props.styleIndex!==0)
+          document.querySelectorAll(`[data-styleIndex='${props.styleIndex}']`).forEach(el=>{ el.style.border=`1px solid ${el.style.color}`; el.style.borderRadius='3px'; })
       }}
       onMouseOut={()=>{
-        document.querySelectorAll(`[data-styleIndex='${props.styleIndex}']`).forEach(el=> el.style.border='none')
+        if(props.styleIndex!==0)
+          document.querySelectorAll(`[data-styleIndex='${props.styleIndex}']`).forEach(el=> el.style.border='none')
       }}
       style={props.style}
     >

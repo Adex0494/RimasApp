@@ -154,7 +154,7 @@ function App() {
       <p>
         {words.map((wordStyle, i) =>
           wordStyle !== "\n" ? (
-            <ColoredWord key={i} style={stylesArr[wordStyle[1]]} styleIndex={[wordStyle[1]]}>
+            <ColoredWord key={i} style={stylesArr[wordStyle[1]]} styleIndex={wordStyle[1]}>
               {`${wordStyle[0]} `}
             </ColoredWord>
           ) : (
